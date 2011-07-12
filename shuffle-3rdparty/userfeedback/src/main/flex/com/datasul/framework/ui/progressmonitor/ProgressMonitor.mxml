@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox borderStyle="solid"
+		 borderColor="#eeeeee"
+		 backgroundColor="#FAFAFA"
+		 xmlns:progressmonitor="com.datasul.hcm.infrastructure.progressmonitor.*"
+		 xmlns:mx="http://www.adobe.com/2006/mxml"
+		 cornerRadius="5"
+		 horizontalScrollPolicy="off"
+		 verticalScrollPolicy="off"
+		 width="120"
+		 height="80"
+		 label="{null}"
+		 verticalAlign="middle"
+		 dropShadowEnabled="true"
+		 verticalCenter="0"
+		 horizontalCenter="0">
+
+	<mx:Style source="/assets/css/progressmonitor.css"/>
+
+	<mx:Metadata>
+	/**
+	 *  @eventType com.datasul.framework.ui.progressmonitor.ProgressMonitorEvent.ERROR
+	 */
+	[Event(name="errorProgressMonitor", type="com.datasul.framework.ui.progressmonitor.ProgressMonitorEvent")]
+	</mx:Metadata>
+
+	<mx:states>
+
+		<mx:State name="error">
+
+			<!-- <mx:RemoveChild target="{centerer}"/> -->
+			<mx:RemoveChild target="{progress}"/>
+
+			<mx:AddChild position="lastChild">
+
+				<mx:Canvas id="errorHBox"
+						   height="100%"
+						   width="100%"
+						   horizontalCenter="0"
+						   verticalCenter="0"
+						   verticalScrollPolicy="off"
+						   horizontalScrollPolicy="off">
+
+					<mx:Canvas id="errorBalloon"
+							   styleName="errorBalloonCanvas"
+							   top="10"
+							   left="10"
+							   height="24"
+							   width="24"/>
+
+					<mx:Text text="Não foi possível carregar."
+							 fontFamily="VerdanaAntialiasing"
+							 top="10"
+							 left="42"
+							 right="21"
+							 height="40"
+							 fontSize="12"
+							 color="#A61127"/>
+
+					<mx:LinkButton label="Fechar"
+								   click="hide()"
+								   bottom="0"
+								   right="10"
+								   width="58"/>
+
+					<mx:LinkButton label="Detalhes"
+								   click="errorDetailClick()"
+								   fontWeight="bold"
+								   right="65"
+								   bottom="0"
+								   width="70"/>
+				</mx:Canvas>
+			</mx:AddChild>
+
+			<mx:SetProperty name="width"
+							value="190"/>
+
+			<mx:SetProperty name="height"
+							value="90"/>
+		</mx:State>
+	</mx:states>
+
+	<mx:Script>
+		<![CDATA[
+			import mx.utils.StringUtil;
+			import mx.rpc.events.FaultEvent;
+			import mx.core.Application;
+			import mx.effects.Blur;
+			import mx.managers.PopUpManagerChildList;
+			import mx.core.UIComponent;
+			import mx.managers.PopUpManager;
+			import mx.effects.EffectTargetFilter;
+			import mx.controls.Alert;
+			import mx.effects.Effect;
+			
+			private var _visible:Boolean = false;
+			
+			private var _modal:Boolean = true;
+			
+			public var lockParentOnly:Boolean = false;
+			
+			public var dockParent:UIComponent;
+			
+			private var _blur:Blur;
+			
+			private var myBlurFilter:EffectTargetFilter;
+			
+			private var parameter:String;
+			
+			private var otherParameters:Object;
+			
+			private var centererWidth:Number = 30;
+			
+			private var loaderTop:Number = 18;
+			
+			[Bindable]
+			private var _removeLoaderBorderAndBackground:Boolean = false;
+			
+			[Bindable]
+			private var _animationMessage:String;
+			
+			[Bindable]
+			private var _modalBackgroundColor:uint;
+			
+			private function get blur():Blur {
+				if (_blur == null) {
+					
+					myBlurFilter = new EffectTargetFilter();
+					myBlurFilter.filterFunction = filterFunc;
+					_blur = new Blur(dockParent);
+					_blur.startDelay = 0;
+					_blur.duration = 0;
+					_blur.customFilter = myBlurFilter;
+					
+				}
+				return _blur;
+			}
+			
+			public function filterFunc(propChanges:Array, instanceTarget:Object):Boolean {
+				for (var i:uint = 0; i < propChanges.length; i++) {
+					if (propChanges[i].target == instanceTarget) {
+						
+						if (propChanges[i].target == "datasulProgressMonitor") {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			public function set removeLoaderBorderAndBackground(value:Boolean):void {
+				_removeLoaderBorderAndBackground = value;
+			}
+			
+			public function set animationMessage(message:String):void {
+				_animationMessage = message;
+			}
+			
+			public function set modal(value:Boolean):void {
+				this._modal = value;
+				
+				if (_modal) {
+					this.loaderTop = this.loaderTop + 5;
+					this.centererWidth = this.centererWidth - 5;
+				}
+			}
+			
+			private function centralize():void {
+				PopUpManager.centerPopUp(this);
+			}
+			
+			private function get isVisible():Boolean {
+				return _visible;
+			}
+			
+			private function errorDetailClick():void {
+				var event = new ProgressMonitorEvent(ProgressMonitorEvent.DETAIL_ERROR)
+				event.otherParameters = this.otherParameters;
+				event.parameter = this.parameter;
+				
+				dispatchEvent(event);
+			}
+			
+			private var cnv:Canvas;
+			
+			public function show():void {
+				if (!_visible) {
+					_visible = true;
+					
+					if (_modal) {
+						try {
+							//canvas para fazer o enabled = false		  
+							cnv = new Canvas();
+							cnv.percentWidth = 100;
+							cnv.percentHeight = 100;
+							
+							if (_removeLoaderBorderAndBackground) {
+								this.setStyle("backgroundAlpha", "0.0");
+								this.setStyle("borderStyle", "none");
+							}
+							cnv.setStyle("backgroundColor", _modalBackgroundColor);
+							cnv.alpha = 0.5;
+							cnv.addChild(this);
+							cnv.name = "#ProgressMonitorCanvas";
+							
+							if (lockParentOnly) {
+								if (!dockParent.getChildByName("#ProgressMonitorCanvas")) {
+									dockParent.addChild(cnv);
+								}
+							} else {
+								if (!Application.application.getChildByName("#ProgressMonitorCanvas")) {
+									Application.application.addChild(cnv);
+								}
+							}
+							
+						} catch (e:Error) {
+							trace(e.getStackTrace());
+							PopUpManager.removePopUp(this);
+							PopUpManager.addPopUp(this, dockParent);
+							centralize();
+						}
+						
+					} else {
+						try {
+							if (!dockParent.getChildByName("#ProgressMonitor")) {
+								this.name = "#ProgressMonitor";
+								dockParent.addChild(this);
+							}
+						} catch (e:Error) {
+							PopUpManager.removePopUp(this);
+							PopUpManager.addPopUp(this, dockParent, _modal);
+							centralize();
+						}
+					}
+				}
+			}
+			
+			public function error(event:Event = null):void {
+				this.currentState = "error";
+				
+				if (event && event is ProgressMonitorEvent) {
+					this.parameter = ProgressMonitorEvent(event).parameter;
+					this.otherParameters = ProgressMonitorEvent(event).otherParameters;
+				}
+			}
+			
+			public function hide():void {
+				if (_visible) {
+					currentState = "";
+					_visible = false;
+					
+					if (lockParentOnly) {
+						try {
+							dockParent.removeChild(cnv);
+						} catch (e:Error) {
+							PopUpManager.removePopUp(this);
+						}
+					} else {
+						try {
+							Application.application.removeChild(cnv);
+						} catch (e:Error) {
+							PopUpManager.removePopUp(this);
+						}
+					}
+				}
+			}
+			
+			/**
+			 * Destrí referências
+			 **/
+			public function destroy():void {
+				this._blur = null;
+				this.myBlurFilter = null;
+				this.parameter = null;
+				this.otherParameters = null;
+				this.dockParent = null;
+			}
+			
+			public function set loaderAnimationColor(color:uint):void {
+				try {
+					var colorTransform:ColorTransform = transform.colorTransform;
+					colorTransform.color = color;
+					loader.transform.colorTransform = colorTransform;
+					messageLabel.setStyle("color", color);
+					messageLabel.setStyle("fontSize", "10");
+				} catch (e:Error) {
+					trace("Não foi possível alterar cor da animação\n", e.getStackTrace());
+				}
+			}
+			
+			public function set modalBackgroundColor(color:uint):void {
+				_modalBackgroundColor = color;
+			}
+		]]>
+	</mx:Script>
+
+	<mx:Canvas id="progress"
+			   width="100%"
+			   height="100%"
+			   verticalScrollPolicy="off"
+			   horizontalScrollPolicy="off"
+			   horizontalCenter="0">
+
+		<mx:SWFLoader id="loader"
+					  source="@Embed('/assets/swf/loading.swf')"
+					  horizontalAlign="center"
+					  horizontalCenter="-5"
+					  scaleContent="false"
+					  autoLoad="true"
+					  top="{_removeLoaderBorderAndBackground ? 0 : loaderTop}"
+					  verticalAlign="{_removeLoaderBorderAndBackground ? 'top' : 'middle'}"/>
+
+		<mx:Label id="messageLabel"
+				  textAlign="center"
+				  left="0"
+				  right="0"
+				  bottom="10"
+				  text="{_animationMessage}"
+				  visible="{StringUtil.trim(_animationMessage).length != 0}"
+				  enabled="false"/>
+	</mx:Canvas>
+</mx:HBox>

@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>shuffle-tech-parent-java</artifactId>
+		<groupId>com.shuffle</groupId>
+		<version>0.0.1-beta</version>
+	</parent>
+	<artifactId>shuffle-tech-resources</artifactId>
+	<packaging>war</packaging>
+	<name>Shuffle Tech Resources</name>
+	<url>http://www.shuffletechsolutions.com</url>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>shuffle-tech-resources</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.0.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>inplace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>${basedir}/src/main/webresources</directory>
+							<targetPath>WEB-INF</targetPath>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>src/main/webapp/WEB-INF/classes</directory>
+						</fileset>
+						<fileset>
+							<directory>src/main/webapp/WEB-INF/lib</directory>
+						</fileset>
+						<fileset>
+							<directory>src/main/webapp/WEB-INF/spring</directory>
+						</fileset>
+						<fileset>
+							<directory>src/main/webapp/WEB-INF</directory>
+							<includes>
+								<include>flex-servlet.xml</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

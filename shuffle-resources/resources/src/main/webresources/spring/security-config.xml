@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+	<!-- <http auto-config="true"> -->
+	<http auto-config="true">
+		<intercept-url pattern="/index.html" filters="none" />
+		<intercept-url pattern="/index.jsp" filters="none" />
+		<intercept-url pattern="/login.jsp" filters="none" />
+		<intercept-url pattern="/**/*.swf" filters="none" />
+		<intercept-url pattern="/**/*.html" access="ROLE_USER" />
+		<intercept-url pattern="/**" filters="none" />
+		<form-login login-page='/login.jsp' />
+		
+		<remember-me key="jbcpStore" token-validity-seconds="3600"
+			data-source-ref="dataSource" />
+		<session-management>
+			<concurrency-control expired-url="/login.do?error=expired" />
+		</session-management>
+	</http>
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider
+			ref="shuffleDaoAuthentication">
+			<password-encoder hash="sha">
+				<salt-source user-property="username" />
+			</password-encoder>
+		</authentication-provider>
+	</authentication-manager>
+
+</beans:beans>

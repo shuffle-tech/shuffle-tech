@@ -1,0 +1,9 @@
+.progressLabel {
+   font-weight:bold;
+}
+
+.closebutton {
+    upSkin: Embed(source='/assets/imgs/progress-monior-close-up.png');
+    overSkin: Embed(source='/assets/imgs/progress-monior-close-over.png');
+    downSkin: Embed(source='/assets/imgs/progress-monior-close-over.png');
+}

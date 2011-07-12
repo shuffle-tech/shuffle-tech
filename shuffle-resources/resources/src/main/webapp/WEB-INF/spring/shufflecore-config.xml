@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.shuffle" />
+
+	<bean
+		class="com.shuffle.security.core.authentication.DatabasePasswordSecurerBean"
+		init-method="secureDatabase" depends-on="dataSource" id="usernamePasswordSecure">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="shuffleDaoAuthentication"
+		class="com.shuffle.security.core.authentication.dao.ShuffleDaoAuthenticationProvider">
+		<property name="passwordEncoder" ref="passwordEncoder" />
+		<property name="saltSource" ref="saltSource" />
+		<property name="userDetailsService" ref="jdbcUserServiceCustom" />
+	</bean>
+
+<!-- 	<bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy"> -->
+<!-- 		<security:filter-chain-map path-type="ant"> -->
+<!-- 			<security:filter-chain pattern="/**" -->
+<!-- 				filters=" securityContextPersistenceFilter, usernamePasswordAuthenticationFilter, anonymousAuthenticationFilter, filterSecurityInterceptor" /> -->
+<!-- 		</security:filter-chain-map> -->
+<!-- 	</bean> -->
+
+	<!-- <bean id="daoAuthenticationProvider" -->
+	<!-- class="org.springframework.security.authentication.dao.DaoAuthenticationProvider"> -->
+	<!-- <property name="passwordEncoder" ref="passwordEncoder" /> -->
+	<!-- <property name="saltSource" ref="saltSource" /> -->
+	<!-- <property name="userDetailsService" ref="jdbcUserService" /> -->
+	<!-- </bean> -->
+
+	<bean
+		class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"
+		id="passwordEncoder" />
+	<bean
+		class="org.springframework.security.authentication.dao.ReflectionSaltSource"
+		id="saltSource">
+		<property name="userPropertyToUse" value="salt" />
+	</bean>
+
+	<bean id="jdbcUserServiceCustom"
+		class="com.shuffle.security.core.authentication.jdbc.ShuffleJdbcDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+		<property name="enableGroups" value="true" />
+		<property name="enableAuthorities" value="false" />
+		<property name="usersByUsernameQuery">
+			<value>SELECT NM_USUARIO AS USERNAME, DS_SENHA AS PASSWORD, SALT FROM
+				USUARIO_SISTEMA WHERE USERNAME = ?</value>
+		</property>
+	</bean>
+
+	<bean id="authenticationUserDetailsService"
+		class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+		<property name="userDetailsService" ref="jdbcUserServiceCustom" />
+	</bean>
+
+</beans>
