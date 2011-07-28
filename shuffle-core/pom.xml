@@ -11,10 +11,10 @@
 		<groupId>com.shuffle</groupId>
 		<version>0.0.1-beta</version>
 	</parent>
-<!--    
+
     <modules>
-        <module>java</module>
-        <module>flex</module>
+        <module>security</module>
+        <module>generic-dao</module>
     </modules>
- -->  
+
 </project>

@@ -256,7 +256,7 @@
 
 		<!-- Spring flex -->
 
-		<dependency>
+		<!--dependency>
 			<groupId>org.springframework.flex</groupId>
 			<artifactId>spring-flex</artifactId>
 			<version>1.0.3.RELEASE</version>
@@ -266,7 +266,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<version>${spring.version}</version>
-		</dependency>
+		</dependency-->
 		<!-- <dependency> -->
 		<!-- <groupId>org.springframework</groupId> -->
 		<!-- <artifactId>spring-jms</artifactId> -->
@@ -317,15 +317,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-
-		<!-- Test Dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -366,8 +357,9 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		
 		<!-- Caelum Stella -->
-		<dependency>
+		<!--dependency>
 			<groupId>br.com.caelum.stella</groupId>
 			<artifactId>caelum-stella-core</artifactId>
 			<version>2.0-beta1</version>
@@ -386,11 +378,8 @@
 			<groupId>br.com.caelum.stella</groupId>
 			<artifactId>caelum-stella-bean-validation</artifactId>
 			<version>2.0-beta1</version>
-		</dependency>
+		</dependency-->
+		
 	</dependencies>
-	<modules>
-		<module>shuffle-tech-resources</module>
-		<module>shuffle-tech-resources</module>
-	</modules>
 
 </project>
