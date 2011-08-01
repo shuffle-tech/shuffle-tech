@@ -14,14 +14,15 @@
 	</parent>
 
 	<!-- repositories -->
-
 	<repositories>
+		
 		<!-- JBoss Repository used for Java EE 6 pieces -->
 		<repository>
 			<id>repository.jboss.org</id>
 			<name>JBoss Repository</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 		</repository>
+		
 		<!-- Spring -->
 		<repository>
 			<id>org.springframework.maven.milestone</id>
@@ -31,6 +32,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		
 		<!-- Flex Mojos -->
 		<repository>
 			<id>flex-mojos-repository</id>
@@ -118,14 +120,22 @@
 	<!-- dependencies -->
 
 	<dependencies>
-		
+ 
 		<!-- JSF 2.1 -->
 		<dependency>
-  			<groupId>javax.faces</groupId>
+  			<groupId>com.sun.faces</groupId>
   			<artifactId>jsf-api</artifactId>
-  			<version>2.1</version>
-  			<!--scope>provided</scope-->
+  			<version>2.1.2</version>
+  			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+    		<groupId>com.sun.faces</groupId>
+		    <artifactId>jsf-impl</artifactId>
+		    <version>2.1.2</version>
+		    <scope>compile</scope>
+  		</dependency>
+		
 	
 		<!-- PrimeFaces 2.2 -->
 		<dependency>  
@@ -144,11 +154,30 @@
 
 		<!-- Servlet -->
 		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>jstl</artifactId>
+		    <version>1.2</version>
+  		</dependency>
+
+		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
+		    <artifactId>servlet-api</artifactId>
+		    <version>2.5</version>
+		    <scope>provided</scope>
+	    </dependency>
+
+	    <dependency>
+		    <groupId>javax.servlet.jsp</groupId>
+		    <artifactId>jsp-api</artifactId>
+		    <version>2.1</version>
 		</dependency>
+
+		<dependency>
+		    <groupId>com.sun.el</groupId>
+		    <artifactId>el-ri</artifactId>
+		    <version>1.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>backport-util-concurrent</groupId>
 			<artifactId>backport-util-concurrent</artifactId>
